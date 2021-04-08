@@ -5,12 +5,11 @@ import 'dart:io';
 import 'package:dart_pact_consumer/src/functional.dart';
 import 'package:dart_pact_consumer/src/json_serialize.dart';
 import 'package:dart_pact_consumer/src/pact_contract_dto.dart';
+import 'package:dart_pact_consumer/src/pact_host_client.dart';
 
 class ContractRepository {
   final Map<String, Contract> contracts = {};
-  HttpClient _client;
-
-  ContractRepository({HttpClient client}): _client = client;
+  ContractRepository();
 
   void add(ContractBuilder builder) {
     builder.validate();
@@ -19,30 +18,10 @@ class ContractRepository {
     _merge(builder, contract);
   }
 
-  Future<void> publish(String host, String version, {List<String> tags}) {
+  Future<void> publish(PactHost host, String version) {
     final futures = contracts.values
-        .map((e) => _publishContract('$host/pacts', version, e));
+        .map((e) => host.publishContract(e, version));
     return Future.wait(futures);
-  }
-
-  Future<void> _publishContract(
-      String baseUri, String version, Contract contract) async {
-    final urlStr = '$baseUri/provider/${contract.provider.name}/consumer/'
-        '${contract.consumer.name}/version/$version';
-    _client ??= HttpClient();
-
-    var uri = Uri.parse(urlStr);
-    final request = await _client.putUrl(uri);
-    request.headers.contentType = ContentType.json;
-    request.write(jsonEncode(contract.toJson()));
-
-    final response = await request.close();
-
-    var statusCode = response.statusCode;
-    if (statusCode > 299) {
-      throw HttpException('Status code not success: $statusCode.'
-          'Reason: ${response.reasonPhrase}', uri: uri);
-    }
   }
 
   String _key(ContractBuilder builder) =>

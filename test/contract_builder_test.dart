@@ -1,10 +1,12 @@
 import 'package:dart_pact_consumer/dart_pact_consumer.dart';
+import 'package:dart_pact_consumer/src/pact_host_client.dart';
 import 'package:test/test.dart';
 
 void main() {
   const brokerUrl = 'http://localhost:9292';
 
   group('ContractBuilder for pact broker', () {
+    final host = PactHost(brokerUrl);
     final repo = ContractRepository();
 
     ContractBuilder petShopApiBuilder() {
@@ -69,7 +71,7 @@ void main() {
     });
 
     tearDownAll(() async {
-      await repo.publish(brokerUrl, '0.0.1');
+      await repo.publish(host, '0.0.1');
     });
   });
 }

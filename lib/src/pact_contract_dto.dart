@@ -35,7 +35,6 @@ class Metadata {
       _$MetadataFromJson(json);
 
   Map<String, dynamic> toJson() => _$MetadataToJson(this);
-
 }
 
 @JsonSerializable()

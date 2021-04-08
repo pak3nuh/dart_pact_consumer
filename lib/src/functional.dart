@@ -58,3 +58,19 @@ class Unit implements CustomJson {
   @override
   dynamic toJson() => null;
 }
+
+/// Ensures lazy initialization of non nullable values
+class Lazy<T> {
+
+  T _value;
+  final T Function() _producer;
+
+  Lazy(this._value, this._producer): assert(_producer != null);
+
+  T get value {
+    _value ??= _producer();
+    assert(_value != null);
+    return _value;
+  }
+
+}
