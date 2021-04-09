@@ -7,6 +7,7 @@ import 'package:dart_pact_consumer/src/json_serialize.dart';
 import 'package:dart_pact_consumer/src/pact_contract_dto.dart';
 import 'package:dart_pact_consumer/src/pact_host_client.dart';
 
+// todo rename to PactXXX
 class ContractRepository {
   final Map<String, Contract> contracts = {};
   ContractRepository();
@@ -196,6 +197,9 @@ class Body extends Union3<Json, String, Unit> implements CustomJson {
 ///
 /// The definition is relaxed to dynamic to allow more flexibility. No need
 /// to create unions for every valid Json type.
+///
+/// Designed to work with custom Json objects or to interoperate with
+/// classes that comply with the Json serialization conventions.
 class Json extends Union2<Iterable<dynamic>, Map<String, dynamic>>
     implements CustomJson {
   Json.object(Map<String, dynamic> json) : super.t2(json);
@@ -213,6 +217,8 @@ class Json extends Union2<Iterable<dynamic>, Map<String, dynamic>>
 
 class Status {
   final int code;
+
+  static final Status ok = Status(200);
 
   Status(this.code) : assert(code >= 100 && code <= 599);
 }
