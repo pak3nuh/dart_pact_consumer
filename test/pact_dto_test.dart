@@ -8,7 +8,7 @@ void main() {
 
   group('Pact contract DTO', () {
     test('should serialize to json', () {
-      var contract = Contract();
+      var contract = Pact();
       contract
         ..consumer = (Consumer()..name = 'my consumer')
         ..provider = (Provider()..name = 'my Provider')

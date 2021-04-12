@@ -7,34 +7,38 @@ import 'package:dart_pact_consumer/src/json_serialize.dart';
 import 'package:dart_pact_consumer/src/pact_contract_dto.dart';
 import 'package:dart_pact_consumer/src/pact_host_client.dart';
 
-// todo rename to PactXXX
-class ContractRepository {
-  final Map<String, Contract> contracts = {};
-  ContractRepository();
+/// Holder for pacts in their build form.
+///
+/// Can merge several builders into a single [Pact] with all the combined
+/// interactions
+class PactRepository {
+  final Map<String, Pact> pacts = {};
+  PactRepository();
 
-  void add(ContractBuilder builder) {
+  /// Adds all the request-response pairs as interactions in a [Pact] structure.
+  void add(PactBuilder builder) {
     builder.validate();
     final contract =
-        contracts.putIfAbsent(_key(builder), () => _create(builder));
+        pacts.putIfAbsent(_key(builder), () => _create(builder));
     _merge(builder, contract);
   }
 
   Future<void> publish(PactHost host, String version) {
-    final futures = contracts.values
+    final futures = pacts.values
         .map((e) => host.publishContract(e, version));
     return Future.wait(futures);
   }
 
-  String _key(ContractBuilder builder) =>
+  String _key(PactBuilder builder) =>
       '${builder.consumer}|${builder.provider}';
 
-  Contract _create(ContractBuilder builder) {
-    return Contract()
+  Pact _create(PactBuilder builder) {
+    return Pact()
       ..provider = (Provider()..name = builder.provider)
       ..consumer = (Consumer()..name = builder.consumer);
   }
 
-  void _merge(ContractBuilder builder, Contract contract) {
+  void _merge(PactBuilder builder, Pact contract) {
     final interactions = builder.stateBuilder.expand(
         (st) => st.requests.map((req) => _toInteraction(req, st.state)));
     contract.interactions.addAll(interactions);
@@ -84,10 +88,10 @@ class ContractRepository {
 /// . Request matchers
 /// . Generators
 /// . Encoders
-class ContractBuilder {
+class PactBuilder {
   String consumer;
   String provider;
-  List<StateBuilder> _states = [];
+  final List<StateBuilder> _states = [];
 
   List<StateBuilder> get stateBuilder => _states;
 

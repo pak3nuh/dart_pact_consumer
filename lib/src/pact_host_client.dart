@@ -13,7 +13,7 @@ class PactHost {
   PactHost(this._hostUri, {HttpClient client})
       : _lazyClient = Lazy(client, () => HttpClient());
 
-  Future<void> publishContract(Contract contract, String version) async {
+  Future<void> publishContract(Pact contract, String version) async {
     final urlStr =
         '${_pactUrl(contract.provider.name, contract.consumer.name)}/version/$version';
 

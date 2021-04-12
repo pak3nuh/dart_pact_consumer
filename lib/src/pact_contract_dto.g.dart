@@ -6,8 +6,8 @@ part of 'pact_contract_dto.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-Contract _$ContractFromJson(Map<String, dynamic> json) {
-  return Contract()
+Pact _$PactFromJson(Map<String, dynamic> json) {
+  return Pact()
     ..provider = json['provider'] == null
         ? null
         : Provider.fromJson(json['provider'] as Map<String, dynamic>)
@@ -23,7 +23,7 @@ Contract _$ContractFromJson(Map<String, dynamic> json) {
         : Metadata.fromJson(json['metadata'] as Map<String, dynamic>);
 }
 
-Map<String, dynamic> _$ContractToJson(Contract instance) {
+Map<String, dynamic> _$PactToJson(Pact instance) {
   final val = <String, dynamic>{};
 
   void writeNotNull(String key, dynamic value) {

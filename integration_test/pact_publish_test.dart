@@ -1,4 +1,4 @@
-import 'package:dart_pact_consumer/dart_pact_consumer.dart';
+import 'package:dart_pact_consumer/src/contract_builder_api.dart';
 import 'package:dart_pact_consumer/src/pact_host_client.dart';
 import 'package:test/test.dart';
 
@@ -7,10 +7,10 @@ void main() {
 
   group('ContractBuilder for pact broker', () {
     final host = PactHost(brokerUrl);
-    final repo = ContractRepository();
+    final repo = PactRepository();
 
-    ContractBuilder petShopApiBuilder() {
-      return ContractBuilder()
+    PactBuilder petShopApiBuilder() {
+      return PactBuilder()
         ..consumer = 'dart-consumer'
         ..provider = 'pet-shop-api-provider';
     }

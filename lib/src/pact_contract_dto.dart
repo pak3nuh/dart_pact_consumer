@@ -8,18 +8,18 @@ part 'pact_contract_dto.g.dart';
 // https://github.com/pact-foundation/pact-specification/tree/version-4
 
 @JsonSerializable()
-class Contract {
+class Pact {
   Provider provider;
   Consumer consumer;
   List<Interaction> interactions = [];
   Metadata metadata = Metadata();
 
-  Contract();
+  Pact();
 
-  factory Contract.fromJson(Map<String, dynamic> json) =>
-      _$ContractFromJson(json);
+  factory Pact.fromJson(Map<String, dynamic> json) =>
+      _$PactFromJson(json);
 
-  Map<String, dynamic> toJson() => _$ContractToJson(this);
+  Map<String, dynamic> toJson() => _$PactToJson(this);
 }
 
 @JsonSerializable()
