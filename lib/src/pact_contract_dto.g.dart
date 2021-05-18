@@ -66,6 +66,7 @@ Map<String, dynamic> _$MetadataToJson(Metadata instance) {
 
 Interaction _$InteractionFromJson(Map<String, dynamic> json) {
   return Interaction()
+    ..type = json['type'] as String
     ..description = json['description'] as String
     ..request = json['request'] == null
         ? null
@@ -89,6 +90,7 @@ Map<String, dynamic> _$InteractionToJson(Interaction instance) {
     }
   }
 
+  writeNotNull('type', instance.type);
   writeNotNull('description', instance.description);
   writeNotNull('request', instance.request);
   writeNotNull('response', instance.response);
