@@ -74,13 +74,26 @@ class Response {
 
   Map<String, String> headers = {};
 
-  @JsonKey(fromJson: _fromJsonToBody)
-  Body body;
+  RequestResponseBody body;
 
   factory Response.fromJson(Map<String, dynamic> json) =>
       _$ResponseFromJson(json);
 
   Map<String, dynamic> toJson() => _$ResponseToJson(this);
+}
+
+@JsonSerializable()
+class RequestResponseBody {
+  String contentType;
+  String encoded;
+  dynamic content;
+
+  RequestResponseBody();
+
+  factory RequestResponseBody.fromJson(Map<String, dynamic> json) =>
+      _$RequestResponseBodyFromJson(json);
+
+  Map<String, dynamic> toJson() => _$RequestResponseBodyToJson(this);
 }
 
 @JsonSerializable()
@@ -91,9 +104,7 @@ class Request {
   String path;
   Map<String, String> query = {};
   Map<String, String> headers = {};
-
-  @JsonKey(fromJson: _fromJsonToBody)
-  Body body;
+  RequestResponseBody body;
 
   factory Request.fromJson(Map<String, dynamic> json) =>
       _$RequestFromJson(json);
@@ -123,23 +134,4 @@ class Consumer {
       _$ConsumerFromJson(json);
 
   Map<String, dynamic> toJson() => _$ConsumerToJson(this);
-}
-
-Body _fromJsonToBody(dynamic body) {
-  if (body == null) {
-    return Body.none();
-  }
-
-  if (body is String) {
-    return Body.string(body);
-  }
-
-  if (body is Map<String, dynamic>) {
-    return Body.json(Json.object(body));
-  }
-
-  if (body is Iterable<dynamic>) {
-    return Body.json(Json.array(body));
-  }
-  throw AssertionError('Unknown body type ${body.runtimeType}');
 }

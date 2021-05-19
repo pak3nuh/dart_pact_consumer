@@ -58,7 +58,7 @@ class PactRepository {
       ..method = _toMethod(requestBuilder.method)
       ..path = requestBuilder.path
       ..query = requestBuilder.query
-      ..body = requestBuilder.body
+      ..body = (_toBody(requestBuilder.body))
       ..headers = requestBuilder.headers;
   }
 
@@ -66,13 +66,22 @@ class PactRepository {
     return Response()
       ..headers = response.headers
       ..status = response.status.code
-      ..body = response.body;
+      ..body = (_toBody(response.body));
+  }
+
+  RequestResponseBody _toBody(Body body) {
+    return RequestResponseBody()
+        ..content = body.content
+        ..contentType = body.contentType
+        ..encoded = body.encoded;
   }
 
   String _toMethod(Method method) {
     const prefix = 'Method.';
     return method.toString().substring(prefix.length);
   }
+
+
 }
 
 /// DSL for building pact contracts.
@@ -190,21 +199,18 @@ class ResponseBuilder {
 }
 
 /// Models a request/response body.
-class Body extends Union3<Json, String, Unit> implements CustomJson {
-  Body.json(Json json) : super.t1(json);
+class Body {
+  final String contentType;
+  final String encoded = 'false';
+  final dynamic content;
 
-  Body.string(String str) : super.t2(str);
+  Body.json(Json json):
+    contentType = 'application/json',
+    content = json.toJson();
 
-  Body.none() : super.t3(unit);
+  Body.string(this.content, this.contentType);
 
-  @override
-  dynamic toJson() {
-    return fold(
-      (js) => js.toJson(),
-      (str) => str,
-      (unit) => unit.toJson(),
-    );
-  }
+  Body.none(): contentType = null, content = null;
 }
 
 /// Models a Json object.

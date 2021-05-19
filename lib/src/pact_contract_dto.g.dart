@@ -124,7 +124,9 @@ Response _$ResponseFromJson(Map<String, dynamic> json) {
     ..headers = (json['headers'] as Map<String, dynamic>)?.map(
       (k, e) => MapEntry(k, e as String),
     )
-    ..body = _fromJsonToBody(json['body']);
+    ..body = json['body'] == null
+        ? null
+        : RequestResponseBody.fromJson(json['body'] as Map<String, dynamic>);
 }
 
 Map<String, dynamic> _$ResponseToJson(Response instance) {
@@ -142,6 +144,28 @@ Map<String, dynamic> _$ResponseToJson(Response instance) {
   return val;
 }
 
+RequestResponseBody _$RequestResponseBodyFromJson(Map<String, dynamic> json) {
+  return RequestResponseBody()
+    ..contentType = json['contentType'] as String
+    ..encoded = json['encoded'] as String
+    ..content = json['content'];
+}
+
+Map<String, dynamic> _$RequestResponseBodyToJson(RequestResponseBody instance) {
+  final val = <String, dynamic>{};
+
+  void writeNotNull(String key, dynamic value) {
+    if (value != null) {
+      val[key] = value;
+    }
+  }
+
+  writeNotNull('contentType', instance.contentType);
+  writeNotNull('encoded', instance.encoded);
+  writeNotNull('content', instance.content);
+  return val;
+}
+
 Request _$RequestFromJson(Map<String, dynamic> json) {
   return Request()
     ..method = json['method'] as String
@@ -152,7 +176,9 @@ Request _$RequestFromJson(Map<String, dynamic> json) {
     ..headers = (json['headers'] as Map<String, dynamic>)?.map(
       (k, e) => MapEntry(k, e as String),
     )
-    ..body = _fromJsonToBody(json['body']);
+    ..body = json['body'] == null
+        ? null
+        : RequestResponseBody.fromJson(json['body'] as Map<String, dynamic>);
 }
 
 Map<String, dynamic> _$RequestToJson(Request instance) {
