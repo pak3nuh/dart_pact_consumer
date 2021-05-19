@@ -163,6 +163,7 @@ class RequestBuilder {
     assert(path != null);
     assert(query != null);
     assert(method != null);
+    assert(type != null);
     assert(_response != null);
     assert(body != null);
     assert(headers != null);
