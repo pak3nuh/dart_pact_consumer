@@ -39,6 +39,7 @@ class Metadata {
 
 @JsonSerializable()
 class Interaction {
+  String type;
   String description;
   Request request;
   Response response;

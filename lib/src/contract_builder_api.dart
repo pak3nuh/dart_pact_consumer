@@ -48,6 +48,7 @@ class PactRepository {
     return Interaction()
       ..description = requestBuilder.description
       ..providerStates = [ProviderState()..name = state]
+      ..type = requestBuilder.type.value
       ..request = (_toRequest(requestBuilder))
       ..response = (_toResponse(requestBuilder.response));
   }
@@ -111,6 +112,13 @@ class PactBuilder {
 
 enum Method { GET, POST, DELETE, PUT }
 
+class InteractionType {
+  final String value;
+  InteractionType._(this.value);
+
+  static InteractionType SYNCHRONOUS_HTTP = InteractionType._('Synchronous/HTTP');
+}
+
 class StateBuilder {
   String state;
 
@@ -135,6 +143,7 @@ class RequestBuilder {
   String path;
   String description = '';
   Method method = Method.GET;
+  InteractionType type = InteractionType.SYNCHRONOUS_HTTP;
   ResponseBuilder _response;
 
   Map<String, String> query = {};
@@ -154,6 +163,7 @@ class RequestBuilder {
     assert(path != null);
     assert(query != null);
     assert(method != null);
+    assert(type != null);
     assert(_response != null);
     assert(body != null);
     assert(headers != null);
