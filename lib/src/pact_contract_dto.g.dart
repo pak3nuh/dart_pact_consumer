@@ -66,7 +66,6 @@ Map<String, dynamic> _$MetadataToJson(Metadata instance) {
 
 Interaction _$InteractionFromJson(Map<String, dynamic> json) {
   return Interaction()
-    ..type = json['type'] as String
     ..description = json['description'] as String
     ..request = json['request'] == null
         ? null
@@ -90,7 +89,6 @@ Map<String, dynamic> _$InteractionToJson(Interaction instance) {
     }
   }
 
-  writeNotNull('type', instance.type);
   writeNotNull('description', instance.description);
   writeNotNull('request', instance.request);
   writeNotNull('response', instance.response);
@@ -124,7 +122,7 @@ Response _$ResponseFromJson(Map<String, dynamic> json) {
     ..headers = (json['headers'] as Map<String, dynamic>)?.map(
       (k, e) => MapEntry(k, e as String),
     )
-    ..body = _fromJsonToBody(json['body']);
+    ..body = Body.fromJsonToBody(json['body']);
 }
 
 Map<String, dynamic> _$ResponseToJson(Response instance) {
@@ -152,7 +150,7 @@ Request _$RequestFromJson(Map<String, dynamic> json) {
     ..headers = (json['headers'] as Map<String, dynamic>)?.map(
       (k, e) => MapEntry(k, e as String),
     )
-    ..body = _fromJsonToBody(json['body']);
+    ..body = Body.fromJsonToBody(json['body']);
 }
 
 Map<String, dynamic> _$RequestToJson(Request instance) {

@@ -16,7 +16,6 @@ void main() {
           Interaction()
             ..description = 'my description'
             ..providerStates = [ProviderState()..name = 'my state']
-            ..type = 'Synchronous/HTTP'
             ..request = (Request()
               ..method = 'GET'
               ..path = 'my/path'
@@ -31,14 +30,14 @@ void main() {
             ..response = (Response()
               ..headers = {"content-type": "text/plain"}
               ..status = 200
-              ..body = Body.none())
+              ..body = Body.isNullOrAbsent())
         ];
 
       var asJson = contract.toJson();
       var asString = jsonEncode(asJson);
       //prints(asJson);
       const expected =
-      '''{"provider":{"name":"my Provider"},"consumer":{"name":"my consumer"},"interactions":[{"type":"Synchronous/HTTP","description":"my description","request":{"method":"GET","path":"my/path","query":{"name":"john"},"headers":{"accept":"application/json"},"body":[{"my-key":"my-value"},"plain string"]},"response":{"status":200,"headers":{"content-type":"text/plain"},"body":null},"providerStates":[{"name":"my state","params":{}}]}],"metadata":{"pactSpecification":{"version":"4.0"},"pact-dart":{"version":"0.0.1"}}}''';
+      '''{"provider":{"name":"my Provider"},"consumer":{"name":"my consumer"},"interactions":[{"description":"my description","request":{"method":"GET","path":"my/path","query":{"name":"john"},"headers":{"accept":"application/json"},"body":[{"my-key":"my-value"},"plain string"]},"response":{"status":200,"headers":{"content-type":"text/plain"},"body":null},"providerStates":[{"name":"my state","params":{}}]}],"metadata":{"pactSpecification":{"version":"3.0.0"},"pact-dart":{"version":"0.0.3"}}}''';
       expect(asString, expected);
     });
   });
