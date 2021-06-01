@@ -5,7 +5,7 @@ import 'contract_builder_api.dart';
 part 'pact_contract_dto.g.dart';
 
 // formal specification
-// https://github.com/pact-foundation/pact-specification/tree/version-4
+// https://github.com/pact-foundation/pact-specification/tree/version-3
 
 @JsonSerializable()
 class Pact {
@@ -26,10 +26,10 @@ class Pact {
 class Metadata {
   Metadata();
 
-  Map<String, String> pactSpecification = {'version': '4.0'};
+  Map<String, String> pactSpecification = {'version': '3.0.0'};
 
   @JsonKey(name: 'pact-dart')
-  Map<String, String> pactDart = {'version': '0.0.1'};
+  Map<String, String> pactDart = {'version': '0.0.3'};
 
   factory Metadata.fromJson(Map<String, dynamic> json) =>
       _$MetadataFromJson(json);
@@ -39,7 +39,6 @@ class Metadata {
 
 @JsonSerializable()
 class Interaction {
-  String type;
   String description;
   Request request;
   Response response;
@@ -74,7 +73,7 @@ class Response {
 
   Map<String, String> headers = {};
 
-  @JsonKey(fromJson: _fromJsonToBody)
+  @JsonKey(fromJson: Body.fromJsonToBody)
   Body body;
 
   factory Response.fromJson(Map<String, dynamic> json) =>
@@ -92,7 +91,7 @@ class Request {
   Map<String, String> query = {};
   Map<String, String> headers = {};
 
-  @JsonKey(fromJson: _fromJsonToBody)
+  @JsonKey(fromJson: Body.fromJsonToBody)
   Body body;
 
   factory Request.fromJson(Map<String, dynamic> json) =>
@@ -123,23 +122,4 @@ class Consumer {
       _$ConsumerFromJson(json);
 
   Map<String, dynamic> toJson() => _$ConsumerToJson(this);
-}
-
-Body _fromJsonToBody(dynamic body) {
-  if (body == null) {
-    return Body.none();
-  }
-
-  if (body is String) {
-    return Body.string(body);
-  }
-
-  if (body is Map<String, dynamic>) {
-    return Body.json(Json.object(body));
-  }
-
-  if (body is Iterable<dynamic>) {
-    return Body.json(Json.array(body));
-  }
-  throw AssertionError('Unknown body type ${body.runtimeType}');
 }

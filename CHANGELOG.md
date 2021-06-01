@@ -5,3 +5,7 @@
 ## 0.0.2
 
 - Changes for publishing on pub.dev
+
+## 0.0.3
+
+- Downgrades pact version spec to 3.0.0

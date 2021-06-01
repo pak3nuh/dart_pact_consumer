@@ -21,7 +21,6 @@ void main() {
           ..state = 'pet shop with 3 pets'
           ..addRequest((req) => req
             ..description = 'should get pet list'
-            ..type = InteractionType.SYNCHRONOUS_HTTP
             ..method = Method.GET
             ..path = '/pets/'
             ..setResponse((resp) => resp
