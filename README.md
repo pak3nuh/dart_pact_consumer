@@ -8,3 +8,4 @@ Docker setup in the [docker](./docker) folder.
 
 ## Json generation
 `dart pub run build_runner build --delete-conflicting-outputs`
+

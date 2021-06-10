@@ -7,29 +7,36 @@ part 'pact_contract_dto.g.dart';
 // formal specification
 // https://github.com/pact-foundation/pact-specification/tree/version-3
 
-@JsonSerializable()
+@JsonSerializable(includeIfNull: false)
 class Pact {
   Provider provider;
   Consumer consumer;
-  List<Interaction> interactions = [];
+  List<Interaction>? interactions;
   Metadata metadata = Metadata();
 
-  Pact();
+  Pact({
+    required this.provider,
+    required this.consumer,
+    this.interactions,
+    this.metadata = const Metadata(),
+  });
 
-  factory Pact.fromJson(Map<String, dynamic> json) =>
-      _$PactFromJson(json);
+  factory Pact.fromJson(Map<String, dynamic> json) => _$PactFromJson(json);
 
   Map<String, dynamic> toJson() => _$PactToJson(this);
 }
 
-@JsonSerializable()
+@JsonSerializable(includeIfNull: false)
 class Metadata {
-  Metadata();
-
-  Map<String, String> pactSpecification = {'version': '3.0.0'};
+  final Map<String, String> pactSpecification;
 
   @JsonKey(name: 'pact-dart')
-  Map<String, String> pactDart = {'version': '0.0.3'};
+  final Map<String, String> pactDart;
+
+  const Metadata({
+    this.pactDart = const {'version': '0.0.3'},
+    this.pactSpecification = const {'version': '3.0.0'},
+  });
 
   factory Metadata.fromJson(Map<String, dynamic> json) =>
       _$MetadataFromJson(json);
@@ -37,14 +44,19 @@ class Metadata {
   Map<String, dynamic> toJson() => _$MetadataToJson(this);
 }
 
-@JsonSerializable()
+@JsonSerializable(includeIfNull: false)
 class Interaction {
-  String description;
   Request request;
   Response response;
-  List<ProviderState> providerStates = [];
+  String? description;
+  List<ProviderState>? providerStates;
 
-  Interaction();
+  Interaction({
+    required this.request,
+    required this.response,
+    this.description,
+    this.providerStates = const [],
+  });
 
   factory Interaction.fromJson(Map<String, dynamic> json) =>
       _$InteractionFromJson(json);
@@ -52,12 +64,15 @@ class Interaction {
   Map<String, dynamic> toJson() => _$InteractionToJson(this);
 }
 
-@JsonSerializable()
+@JsonSerializable(includeIfNull: false)
 class ProviderState {
   String name;
-  Map<String, dynamic> params = {};
+  Map<String, dynamic>? params;
 
-  ProviderState();
+  ProviderState({
+    required this.name,
+    this.params,
+  });
 
   factory ProviderState.fromJson(Map<String, dynamic> json) =>
       _$ProviderStateFromJson(json);
@@ -65,16 +80,20 @@ class ProviderState {
   Map<String, dynamic> toJson() => _$ProviderStateToJson(this);
 }
 
-@JsonSerializable()
+@JsonSerializable(includeIfNull: false)
 class Response {
   int status;
 
-  Response();
-
-  Map<String, String> headers = {};
+  Map<String, String>? headers;
 
   @JsonKey(fromJson: Body.fromJsonToBody)
-  Body body;
+  Body? body;
+
+  Response({
+    required this.status,
+    this.headers,
+    this.body,
+  });
 
   factory Response.fromJson(Map<String, dynamic> json) =>
       _$ResponseFromJson(json);
@@ -82,17 +101,23 @@ class Response {
   Map<String, dynamic> toJson() => _$ResponseToJson(this);
 }
 
-@JsonSerializable()
+@JsonSerializable(includeIfNull: false)
 class Request {
-  Request();
-
   String method;
-  String path;
-  Map<String, String> query = {};
-  Map<String, String> headers = {};
+  String? path;
+  Map<String, String>? query;
+  Map<String, String>? headers;
 
   @JsonKey(fromJson: Body.fromJsonToBody)
-  Body body;
+  Body? body;
+
+  Request({
+    required this.method,
+    this.path,
+    this.body,
+    this.headers,
+    this.query,
+  });
 
   factory Request.fromJson(Map<String, dynamic> json) =>
       _$RequestFromJson(json);
@@ -104,7 +129,7 @@ class Request {
 class Provider {
   String name;
 
-  Provider();
+  Provider({required this.name});
 
   factory Provider.fromJson(Map<String, dynamic> json) =>
       _$ProviderFromJson(json);
@@ -116,7 +141,7 @@ class Provider {
 class Consumer {
   String name;
 
-  Consumer();
+  Consumer({required this.name});
 
   factory Consumer.fromJson(Map<String, dynamic> json) =>
       _$ConsumerFromJson(json);

@@ -10,7 +10,7 @@ class PactHost {
 
   HttpClient get _client => _lazyClient.value;
 
-  PactHost(this._hostUri, {HttpClient client})
+  PactHost(this._hostUri, {HttpClient? client})
       : _lazyClient = Lazy(client, () => HttpClient());
 
   Future<void> publishContract(Pact contract, String version) async {
@@ -72,7 +72,10 @@ class PactHost {
     if (response.contentLength == 0) {
       return '';
     }
+
     final contentType = response.headers.contentType;
+    if (contentType == null) return '';
+
     if (contentType.mimeType == ContentType.json.mimeType ||
         contentType.mimeType == ContentType.text.mimeType) {
       return response.fold<List<int>>([], (prev, elem) => prev..addAll(elem))
