@@ -71,7 +71,7 @@ class ProviderState {
 
   ProviderState({
     required this.name,
-    this.params,
+    this.params = const {},
   });
 
   factory ProviderState.fromJson(Map<String, dynamic> json) =>

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:dart_pact_consumer/src/contract_builder_api.dart';
 import 'package:dart_pact_consumer/src/pact_contract_dto.dart';
 import 'package:test/test.dart';
+import 'package:collection/collection.dart';
 
 void main() {
   group('Pact contract DTO', () {
@@ -37,12 +38,14 @@ void main() {
         ],
       );
 
-      var asJson = contract.toJson();
-      var asString = jsonEncode(asJson);
-      //prints(asJson);
+      var asJson = jsonDecode(jsonEncode(contract));
+
       const expected =
           '''{"provider":{"name":"my Provider"},"consumer":{"name":"my consumer"},"interactions":[{"description":"my description","request":{"method":"GET","path":"my/path","query":{"name":"john"},"headers":{"accept":"application/json"},"body":[{"my-key":"my-value"},"plain string"]},"response":{"status":200,"headers":{"content-type":"text/plain"},"body":null},"providerStates":[{"name":"my state","params":{}}]}],"metadata":{"pactSpecification":{"version":"3.0.0"},"pact-dart":{"version":"0.0.3"}}}''';
-      expect(asString, expected);
+      final expectedJson = jsonDecode(expected);
+
+      // [!] Matching Maps to ignore keys order
+      expect(asJson, expectedJson);
     });
   });
 }
