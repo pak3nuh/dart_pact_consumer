@@ -34,7 +34,7 @@ class Metadata {
   final Map<String, String> pactDart;
 
   const Metadata({
-    this.pactDart = const {'version': '0.0.3'},
+    this.pactDart = const {'version': '1.0.0'},
     this.pactSpecification = const {'version': '3.0.0'},
   });
 
