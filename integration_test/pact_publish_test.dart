@@ -10,9 +10,10 @@ void main() {
     final repo = PactRepository();
 
     PactBuilder petShopApiBuilder() {
-      return PactBuilder()
-        ..consumer = 'dart-consumer'
-        ..provider = 'pet-shop-api-provider';
+      return PactBuilder(
+        consumer: 'dart-consumer',
+        provider: 'pet-shop-api-provider',
+      );
     }
 
     test('should get pet list', () async {
@@ -26,21 +27,9 @@ void main() {
             ..setResponse((resp) => resp
               ..status = Status(200)
               ..body = Body.json(Json.array([
-                Json.object({
-                  'id': 1,
-                  'name': 'Baby shark',
-                  'kind': 'Shark'
-                }),
-                Json.object({
-                  'id': 2,
-                  'name': 'Mr whiskers',
-                  'kind': 'Cat'
-                }),
-                Json.object({
-                  'id': 3,
-                  'name': 'Bob',
-                  'kind': 'Dog'
-                })
+                Json.object({'id': 1, 'name': 'Baby shark', 'kind': 'Shark'}),
+                Json.object({'id': 2, 'name': 'Mr whiskers', 'kind': 'Cat'}),
+                Json.object({'id': 3, 'name': 'Bob', 'kind': 'Dog'})
               ])))));
 
       repo.add(builder);
@@ -54,17 +43,11 @@ void main() {
             ..description = 'should get only Bob'
             ..method = Method.GET
             ..path = '/pets/'
-            ..query = {
-              'name': 'Bob'
-            }
+            ..query = {'name': 'Bob'}
             ..setResponse((resp) => resp
               ..status = Status(200)
               ..body = Body.json(Json.array([
-                Json.object({
-                  'id': 3,
-                  'name': 'Bob',
-                  'kind': 'Dog'
-                })
+                Json.object({'id': 3, 'name': 'Bob', 'kind': 'Dog'})
               ])))));
 
       repo.add(builder);
