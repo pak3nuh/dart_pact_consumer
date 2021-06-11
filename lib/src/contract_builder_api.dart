@@ -136,7 +136,6 @@ class StateBuilder {
   StateBuilder._();
 
   void _validate() {
-    assert(state != null);
     requests.forEach((element) => element._validate());
   }
 
