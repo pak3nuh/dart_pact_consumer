@@ -9,3 +9,8 @@
 ## 0.0.3
 
 - Downgrades pact version spec to 3.0.0
+
+## 0.1.0
+
+- Introduces pact matching in unit tests
+- Better documentation
