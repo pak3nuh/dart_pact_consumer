@@ -1,50 +1,65 @@
-
 import 'dart:convert';
-import 'dart:io';
 
+import 'package:dart_pact_consumer/dart_pact_consumer.dart';
+import 'package:dart_pact_consumer/src/ffi/rust_mock_server.dart';
 import 'package:dart_pact_consumer/src/functional.dart';
 import 'package:dart_pact_consumer/src/json_serialize.dart';
 import 'package:dart_pact_consumer/src/pact_contract_dto.dart';
 import 'package:dart_pact_consumer/src/pact_host_client.dart';
 
-/// Holder for pacts in their build form.
+import 'pact_exceptions.dart';
+
+/// Holder for pacts in their builder form.
 ///
 /// Can merge several builders into a single [Pact] with all the combined
 /// interactions
 class PactRepository {
-  final Map<String, Pact> pacts = {};
-  PactRepository();
+  final Map<String, Pact> _pacts = {};
+  final bool requireTests;
+
+  PactRepository({this.requireTests = true});
 
   /// Adds all the request-response pairs as interactions in a [Pact] structure.
   void add(PactBuilder builder) {
-    builder.validate();
-    final contract =
-        pacts.putIfAbsent(_key(builder), () => _create(builder));
-    _merge(builder, contract);
+    builder.validate(requireTests: requireTests);
+    final contract = _pacts.putIfAbsent(
+        _key(builder.consumer, builder.provider), () => _createHeader(builder));
+    _mergeInteractions(builder, contract);
   }
 
+  /// Publishes all pacts onto a host with tagging a specific version
   Future<void> publish(PactHost host, String version) {
-    final futures = pacts.values
-        .map((e) => host.publishContract(e, version));
+    if (RequestTester.hasErrors) {
+      throw PactException("Can't publish when there are tests with errors");
+    }
+    final futures = _pacts.values.map((e) => host.publishContract(e, version));
     return Future.wait(futures);
   }
 
-  String _key(PactBuilder builder) =>
-      '${builder.consumer}|${builder.provider}';
+  /// Gets a pact file in JSON format
+  String getPactFile(String consumer, String provider) {
+    return _pacts[_key(consumer, provider)].let((value) {
+      return jsonEncode(value);
+    });
+  }
 
-  Pact _create(PactBuilder builder) {
+  static String _key(String consumer, String provider) =>
+      '${consumer}|${provider}';
+
+  static Pact _createHeader(PactBuilder builder) {
     return Pact()
       ..provider = (Provider()..name = builder.provider)
       ..consumer = (Consumer()..name = builder.consumer);
   }
 
-  void _merge(PactBuilder builder, Pact contract) {
-    final interactions = builder.stateBuilder.expand(
+  static void _mergeInteractions(PactBuilder builder, Pact contract) {
+    final interactions = builder.stateBuilders.expand(
         (st) => st.requests.map((req) => _toInteraction(req, st.state)));
     contract.interactions.addAll(interactions);
   }
 
-  Interaction _toInteraction(RequestBuilder requestBuilder, String state) {
+  static Interaction _toInteraction(
+      RequestBuilder requestBuilder, String state) {
     return Interaction()
       ..description = requestBuilder.description
       ..providerStates = [ProviderState()..name = state]
@@ -52,7 +67,7 @@ class PactRepository {
       ..response = (_toResponse(requestBuilder.response));
   }
 
-  Request _toRequest(RequestBuilder requestBuilder) {
+  static Request _toRequest(RequestBuilder requestBuilder) {
     return Request()
       ..method = _toMethod(requestBuilder.method)
       ..path = requestBuilder.path
@@ -61,16 +76,45 @@ class PactRepository {
       ..headers = requestBuilder.headers;
   }
 
-  Response _toResponse(ResponseBuilder response) {
+  static Response _toResponse(ResponseBuilder response) {
     return Response()
       ..headers = response.headers
       ..status = response.status.code
       ..body = response.body;
   }
 
-  String _toMethod(Method method) {
+  static String _toMethod(Method method) {
     const prefix = 'Method.';
     return method.toString().substring(prefix.length);
+  }
+}
+
+typedef RequestTestFunction = Future<dynamic> Function(MockServer server);
+
+class RequestTester {
+  final StateBuilder _stateBuilder;
+
+  // todo shouldn't be static
+  static bool hasErrors = false;
+
+  RequestTester._(this._stateBuilder);
+
+  void test(MockServerFactory factory, RequestTestFunction testFunction) async {
+    final pactBuilder = PactBuilder()..stateBuilders.add(_stateBuilder);
+    final pact = PactRepository._createHeader(pactBuilder);
+    PactRepository._mergeInteractions(pactBuilder, pact);
+    final server = factory.createMockServer(pact.interactions[0]);
+    try {
+      await testFunction(server);
+      _stateBuilder._tested = true;
+      if (!server.hasMatched()) {
+        hasErrors = true;
+        final mismatchJson = server.getMismatchJson();
+        throw PactMatchingException(mismatchJson);
+      }
+    } finally {
+      factory.closeServer(server);
+    }
   }
 }
 
@@ -78,13 +122,12 @@ class PactRepository {
 ///
 /// Builds an interaction for each state-request-response tuple.
 ///
-/// This DSL doesn't match with the formal specification to simplify contracts.
-/// For instance, it is possible that a single interaction sets multiple states.
-/// It is flexible, but is a source for bugs, since the states may create
-/// conflicting changes on the provider. Other libraries like the JVM one also
-/// don't allow multiple states.
+/// This DSL doesn't match with the formal specification by design.
+/// For instance, the state is mandatory and only after that we can define
+/// the requests.
+/// These changes makes reasoning about pacts easier.
 ///
-/// Not al features are available at first, but can be added as needed:
+/// Not all features are available at first, but can be added as needed:
 /// . Request matchers
 /// . Generators
 /// . Encoders
@@ -93,19 +136,22 @@ class PactBuilder {
   String provider;
   final List<StateBuilder> _states = [];
 
-  List<StateBuilder> get stateBuilder => _states;
+  PactBuilder();
+
+  List<StateBuilder> get stateBuilders => _states;
 
   // builder functions allow to change internals in the future
-  void addState(void Function(StateBuilder builder) func) {
+  RequestTester addState(void Function(StateBuilder stateBuilder) func) {
     final builder = StateBuilder._();
     func(builder);
     _states.add(builder);
+    return RequestTester._(builder);
   }
 
-  void validate() {
+  void validate({bool requireTests = true}) {
     assert(consumer != null);
     assert(provider != null);
-    stateBuilder.forEach((element) => element._validate());
+    stateBuilders.forEach((element) => element._validate(requireTests));
   }
 }
 
@@ -113,16 +159,21 @@ enum Method { GET, POST, DELETE, PUT }
 
 class StateBuilder {
   String state;
+  bool _tested = false;
 
   final List<RequestBuilder> requests = [];
 
-  void _validate() {
+  void _validate(bool requireTests) {
     assert(state != null);
     assert(requests != null);
+    assert(requests.isNotEmpty);
+    if (requireTests && !_tested) {
+      throw PactException('State "$state" not tested');
+    }
     requests.forEach((element) => element._validate());
   }
 
-  void addRequest(void Function(RequestBuilder builder) func) {
+  void addRequest(void Function(RequestBuilder reqBuilder) func) {
     final builder = RequestBuilder._();
     func(builder);
     requests.add(builder);
@@ -132,7 +183,18 @@ class StateBuilder {
 }
 
 class RequestBuilder {
-  String path;
+  String _path = '/';
+
+  String get path => _path;
+
+  set path(String path) {
+    if (path.startsWith('/')) {
+      _path = path;
+    } else {
+      _path = '/$path';
+    }
+  }
+
   String description = '';
   Method method = Method.GET;
   ResponseBuilder _response;
@@ -140,18 +202,19 @@ class RequestBuilder {
   Map<String, String> query = {};
 
   ResponseBuilder get response => _response;
-  Body body = Body.empty();
+  Body body = Body.isNullOrAbsent();
 
   Map<String, String> headers = {};
 
-  void setResponse(void Function(ResponseBuilder builder) func) {
+  void setResponse(void Function(ResponseBuilder respBuilder) func) {
     final builder = ResponseBuilder._();
     func(builder);
     _response = builder;
   }
 
   void _validate() {
-    assert(path != null);
+    assert(_path != null);
+    assert(_path != '');
     assert(query != null);
     assert(method != null);
     assert(_response != null);
@@ -186,7 +249,9 @@ class Body extends Union3<Json, String, Unit> implements CustomJson {
   Body.json(Json json) : super.t1(json);
 
   /// Body must be a string
-  Body.string(String str) : assert(str.isNotEmpty), super.t2(str);
+  Body.string(String str)
+      : assert(str.isNotEmpty),
+        super.t2(str);
 
   /// Body must be empty
   Body.empty() : super.t2('');
@@ -194,7 +259,7 @@ class Body extends Union3<Json, String, Unit> implements CustomJson {
   /// Body is explicitly null or is absent.
   ///
   /// [Doc](https://github.com/pact-foundation/pact-specification/tree/version-3#body-is-present-but-is-null)
-  Body.isNullOrAbsent(): super.t3(unit);
+  Body.isNullOrAbsent() : super.t3(unit);
 
   @override
   dynamic toJson() {
@@ -227,7 +292,6 @@ class Body extends Union3<Json, String, Unit> implements CustomJson {
     }
     throw AssertionError('Unknown body type ${body.runtimeType}');
   }
-
 }
 
 /// Models a Json object.
@@ -256,6 +320,7 @@ class Status {
   final int code;
 
   static final Status ok = Status(200);
+  static final Status created = Status(201);
 
   Status(this.code) : assert(code >= 100 && code <= 599);
 }

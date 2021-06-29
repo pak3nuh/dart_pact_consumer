@@ -37,7 +37,7 @@ void main() {
       var asString = jsonEncode(asJson);
       //prints(asJson);
       const expected =
-      '''{"provider":{"name":"my Provider"},"consumer":{"name":"my consumer"},"interactions":[{"description":"my description","request":{"method":"GET","path":"my/path","query":{"name":"john"},"headers":{"accept":"application/json"},"body":[{"my-key":"my-value"},"plain string"]},"response":{"status":200,"headers":{"content-type":"text/plain"},"body":null},"providerStates":[{"name":"my state","params":{}}]}],"metadata":{"pactSpecification":{"version":"3.0.0"},"pact-dart":{"version":"0.0.3"}}}''';
+      '''{"provider":{"name":"my Provider"},"consumer":{"name":"my consumer"},"interactions":[{"description":"my description","request":{"method":"GET","path":"my/path","query":{"name":"john"},"headers":{"accept":"application/json"},"body":[{"my-key":"my-value"},"plain string"]},"response":{"status":200,"headers":{"content-type":"text/plain"},"body":null},"providerStates":[{"name":"my state","params":{}}]}],"metadata":{"pactSpecification":{"version":"3.0.0"},"pact-dart":{"version":"0.1.0"}}}''';
       expect(asString, expected);
     });
   });

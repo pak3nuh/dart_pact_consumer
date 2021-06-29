@@ -61,16 +61,43 @@ class Unit implements CustomJson {
 
 /// Ensures lazy initialization of non nullable values
 class Lazy<T> {
-
   T _value;
-  final T Function() _producer;
+  T Function() _producer;
 
-  Lazy(this._value, this._producer): assert(_producer != null);
+  Lazy(this._value, this._producer) : assert(_producer != null);
+
+  factory Lazy.fromProducer(T Function() producer) {
+    return Lazy(null, producer);
+  }
 
   T get value {
     _value ??= _producer();
     assert(_value != null);
+    _producer = null;
     return _value;
   }
+}
 
+class Optional<T> extends Union2<T, Unit> {
+  Optional.value(T value)
+      : assert(value != null),
+        super.t1(value);
+
+  Optional.empty() : super.t2(unit);
+
+  factory Optional.nullable(T value) {
+    return value?.let((nonNull) => Optional.value(nonNull)) ?? Optional.empty();
+  }
+}
+
+extension ScopeFunctions<T> on T {
+  /// Preforms an operation on a possible null input.
+  ///
+  /// The operation function is only executed on non null cases.
+  R let<R>(R Function(T value) func) {
+    if (this == null) {
+      return null;
+    }
+    return func(this);
+  }
 }

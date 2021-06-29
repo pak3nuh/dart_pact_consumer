@@ -29,7 +29,7 @@ class Metadata {
   Map<String, String> pactSpecification = {'version': '3.0.0'};
 
   @JsonKey(name: 'pact-dart')
-  Map<String, String> pactDart = {'version': '0.0.3'};
+  Map<String, String> pactDart = {'version': '0.1.0'};
 
   factory Metadata.fromJson(Map<String, dynamic> json) =>
       _$MetadataFromJson(json);
