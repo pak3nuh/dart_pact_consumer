@@ -34,7 +34,7 @@ class Metadata {
   final Map<String, String> pactDart;
 
   const Metadata({
-    this.pactDart = const {'version': '1.0.0'},
+    this.pactDart = const {'version': '1.1.0'},
     this.pactSpecification = const {'version': '3.0.0'},
   });
 
@@ -71,7 +71,7 @@ class ProviderState {
 
   ProviderState({
     required this.name,
-    this.params = const {},
+    this.params,
   });
 
   factory ProviderState.fromJson(Map<String, dynamic> json) =>
@@ -105,7 +105,7 @@ class Response {
 class Request {
   String method;
   String? path;
-  Map<String, String>? query;
+  String? query;
   Map<String, String>? headers;
 
   @JsonKey(fromJson: Body.fromJsonToBody)

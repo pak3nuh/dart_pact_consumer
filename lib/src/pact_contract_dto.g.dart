@@ -131,9 +131,7 @@ Request _$RequestFromJson(Map<String, dynamic> json) {
     headers: (json['headers'] as Map<String, dynamic>?)?.map(
       (k, e) => MapEntry(k, e as String),
     ),
-    query: (json['query'] as Map<String, dynamic>?)?.map(
-      (k, e) => MapEntry(k, e as String),
-    ),
+    query: json['query'] as String?,
   );
 }
 

@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:dart_pact_consumer/src/contract_builder_api.dart';
 import 'package:dart_pact_consumer/src/pact_contract_dto.dart';
 import 'package:test/test.dart';
-import 'package:collection/collection.dart';
 
 void main() {
   group('Pact contract DTO', () {
@@ -18,7 +17,7 @@ void main() {
             request: Request(
               method: 'GET',
               path: 'my/path',
-              query: {'name': 'john'},
+              query: 'name=john',
               headers: {'accept': 'application/json'},
               body: Body.json(
                 Json.array(
@@ -41,7 +40,7 @@ void main() {
       var asJson = jsonDecode(jsonEncode(contract));
 
       const expected =
-          '''{"provider":{"name":"my Provider"},"consumer":{"name":"my consumer"},"interactions":[{"description":"my description","request":{"method":"GET","path":"my/path","query":{"name":"john"},"headers":{"accept":"application/json"},"body":[{"my-key":"my-value"},"plain string"]},"response":{"status":200,"headers":{"content-type":"text/plain"},"body":null},"providerStates":[{"name":"my state","params":{}}]}],"metadata":{"pactSpecification":{"version":"3.0.0"},"pact-dart":{"version":"0.0.3"}}}''';
+          '''{"provider":{"name":"my Provider"},"consumer":{"name":"my consumer"},"interactions":[{"description":"my description","request":{"method":"GET","path":"my/path","query":"name=john","headers":{"accept":"application/json"},"body":[{"my-key":"my-value"},"plain string"]},"response":{"status":200,"headers":{"content-type":"text/plain"},"body":null},"providerStates":[{"name":"my state"}]}],"metadata":{"pactSpecification":{"version":"3.0.0"},"pact-dart":{"version":"1.1.0"}}}''';
       final expectedJson = jsonDecode(expected);
 
       // [!] Matching Maps to ignore keys order
