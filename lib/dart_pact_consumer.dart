@@ -1,5 +1,7 @@
 library dart_pact_consumer;
 
-export 'src/contract_builder_api.dart';
-export 'src/pact_contract_dto.dart';
-export 'src/pact_host_client.dart';
+export 'src/builders.dart';
+export 'src/models/body.dart';
+export 'src/models/json.dart';
+export 'src/models/status.dart';
+export 'src/models/serializable/all.dart';

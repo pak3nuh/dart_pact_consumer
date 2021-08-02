@@ -1,4 +1,4 @@
-import 'package:dart_pact_consumer/src/json_serialize.dart';
+import 'package:dart_pact_consumer/src/models/json_serialize.dart';
 
 typedef Mapper<T, R> = R Function(T input);
 
