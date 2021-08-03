@@ -62,7 +62,8 @@ class PactRepository {
 
   Request _toRequest(RequestBuilder requestBuilder) {
     final query = Uri(queryParameters: requestBuilder.query).query;
-    final decodedQuery = Uri.decodeComponent(query);
+    final decodedQuery = query.isEmpty ? null : Uri.decodeComponent(query);
+
     return Request(
       method: _toMethod(requestBuilder.method),
       path: requestBuilder.path,
