@@ -37,7 +37,7 @@ class PactRepository {
   }
 
   /// Gets a pact file in JSON format
-  String getPactFile(String consumer, String provider) {
+  String? getPactFile(String consumer, String provider) {
     return _pacts[_key(consumer, provider)].let((value) {
       return jsonEncode(value);
     });
@@ -99,7 +99,7 @@ class RequestTester {
 
   RequestTester._(this._stateBuilder);
 
-  void test(MockServerFactory factory, RequestTestFunction testFunction) async {
+  Future<void> test(MockServerFactory factory, RequestTestFunction testFunction) async {
     final pactBuilder = PactBuilder()..stateBuilders.add(_stateBuilder);
     final pact = PactRepository._createHeader(pactBuilder);
     PactRepository._mergeInteractions(pactBuilder, pact);
@@ -132,8 +132,8 @@ class RequestTester {
 /// . Generators
 /// . Encoders
 class PactBuilder {
-  String consumer;
-  String provider;
+  late String consumer;
+  late String provider;
   final List<StateBuilder> _states = [];
 
   PactBuilder();
@@ -158,7 +158,7 @@ class PactBuilder {
 enum Method { GET, POST, DELETE, PUT }
 
 class StateBuilder {
-  String state;
+  late String state;
   bool _tested = false;
 
   final List<RequestBuilder> requests = [];
@@ -197,11 +197,11 @@ class RequestBuilder {
 
   String description = '';
   Method method = Method.GET;
-  ResponseBuilder _response;
+  late ResponseBuilder _response;
 
   Map<String, String> query = {};
 
-  ResponseBuilder get response => _response;
+  ResponseBuilder get response => _response ;
   Body body = Body.isNullOrAbsent();
 
   Map<String, String> headers = {};

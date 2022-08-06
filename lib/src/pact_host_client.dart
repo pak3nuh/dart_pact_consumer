@@ -6,12 +6,12 @@ import 'package:dart_pact_consumer/src/pact_contract_dto.dart';
 
 class PactHost {
   final String _hostUri;
-  final Lazy<HttpClient> _lazyClient;
+  final Default<HttpClient> _lazyClient;
 
   HttpClient get _client => _lazyClient.value;
 
-  PactHost(this._hostUri, {HttpClient client})
-      : _lazyClient = Lazy(client, () => HttpClient());
+  PactHost(this._hostUri, {HttpClient? client})
+      : _lazyClient = Default.fromNullable(client, () => HttpClient());
 
   Future<void> publishContract(Pact contract, String version) async {
     final urlStr =
@@ -73,8 +73,8 @@ class PactHost {
       return '';
     }
     final contentType = response.headers.contentType;
-    if (contentType.mimeType == ContentType.json.mimeType ||
-        contentType.mimeType == ContentType.text.mimeType) {
+    if (contentType?.mimeType == ContentType.json.mimeType ||
+        contentType?.mimeType == ContentType.text.mimeType) {
       return response.fold<List<int>>([], (prev, elem) => prev..addAll(elem))
           // todo fixed encoding
           .then((value) => utf8.decode(value));

@@ -8,7 +8,7 @@ void main() {
 
   group('Scope functions', () {
     test('should not map null inputs', () {
-        final String s = null;
+        final String? s = null;
         final result = s.let((value) => throw Exception());
         expect(result, isNull);
     });
@@ -23,7 +23,7 @@ void main() {
   group('Lazy', (){
       test('should invoke producer only once', () {
           var flag = false;
-          var lazy = Lazy.fromProducer(() {
+          var lazy = Default.fromProducer(() {
               if (flag) {
                   throw 'problem';
               }
