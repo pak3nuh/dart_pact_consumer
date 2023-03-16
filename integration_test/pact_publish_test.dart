@@ -15,9 +15,7 @@ void main() async {
     final repo = PactRepository();
 
     PactBuilder petShopApiBuilder() {
-      return PactBuilder()
-        ..consumer = 'dart-consumer'
-        ..provider = 'pet-shop-api-provider';
+      return PactBuilder('dart-consumer', 'pet-shop-api-provider');
     }
 
     test('should get pet list', () async {

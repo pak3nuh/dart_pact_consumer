@@ -100,7 +100,8 @@ class RequestTester {
   RequestTester._(this._stateBuilder);
 
   Future<void> test(MockServerFactory factory, RequestTestFunction testFunction) async {
-    final pactBuilder = PactBuilder()..stateBuilders.add(_stateBuilder);
+    final pactBuilder = PactBuilder("mock-consumer", "mock-provider")
+      ..stateBuilders.add(_stateBuilder);
     final pact = PactRepository._createHeader(pactBuilder);
     PactRepository._mergeInteractions(pactBuilder, pact);
     final server = factory.createMockServer(pact.interactions[0]);
@@ -132,11 +133,11 @@ class RequestTester {
 /// . Generators
 /// . Encoders
 class PactBuilder {
-  late String consumer;
-  late String provider;
+  final String consumer;
+  final String provider;
   final List<StateBuilder> _states = [];
 
-  PactBuilder();
+  PactBuilder(this.consumer, this.provider);
 
   List<StateBuilder> get stateBuilders => _states;
 
@@ -149,8 +150,6 @@ class PactBuilder {
   }
 
   void validate({bool requireTests = true}) {
-    assert(consumer != null);
-    assert(provider != null);
     stateBuilders.forEach((element) => element._validate(requireTests));
   }
 }
@@ -164,8 +163,6 @@ class StateBuilder {
   final List<RequestBuilder> requests = [];
 
   void _validate(bool requireTests) {
-    assert(state != null);
-    assert(requests != null);
     assert(requests.isNotEmpty);
     if (requireTests && !_tested) {
       throw PactException('State "$state" not tested');
@@ -213,13 +210,7 @@ class RequestBuilder {
   }
 
   void _validate() {
-    assert(_path != null);
     assert(_path != '');
-    assert(query != null);
-    assert(method != null);
-    assert(_response != null);
-    assert(body != null);
-    assert(headers != null);
     _response._validate();
   }
 
@@ -234,9 +225,6 @@ class ResponseBuilder {
   Body body = Body.empty();
 
   void _validate() {
-    assert(headers != null);
-    assert(status != null);
-    assert(body != null);
   }
 
   ResponseBuilder._();
@@ -259,15 +247,19 @@ class Body extends Union3<Json, String, Unit> implements CustomJson {
   /// Body is explicitly null or is absent.
   ///
   /// [Doc](https://github.com/pact-foundation/pact-specification/tree/version-3#body-is-present-but-is-null)
-  Body.isNullOrAbsent() : super.t3(unit);
+  Body.isNullOrAbsent() : super.t3(Unit());
 
   @override
   dynamic toJson() {
-    return fold(
+    var result = fold<Object>(
       (js) => js.toJson(),
       (str) => str,
-      (unit) => unit.toJson(),
+      (unit) => unit
     );
+    if (result is Unit) {
+      return null;
+    }
+    return result;
   }
 
   static Body fromJsonToBody(dynamic body) {

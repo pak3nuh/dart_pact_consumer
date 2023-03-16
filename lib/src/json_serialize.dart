@@ -8,5 +8,14 @@
 ///
 /// Use this only on classes that shouldn't be annotated with [JsonSerializable]
 abstract class CustomJson {
+  /// To be called for a custom json serialization.
+  /// This is not a chainable call. If the result is writeable by the
+  /// stringifier, it will result in an exception.
   dynamic toJson();
+}
+
+/// Same as [CustomJson] but reified.
+/// Use with [JsonSerializable] annotated classes
+abstract class ReifiedJson {
+  Map<String, dynamic> toJson();
 }

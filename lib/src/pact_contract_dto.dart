@@ -1,6 +1,7 @@
 import 'package:json_annotation/json_annotation.dart';
 
 import 'contract_builder_api.dart';
+import 'json_serialize.dart';
 
 part 'pact_contract_dto.g.dart';
 
@@ -8,9 +9,9 @@ part 'pact_contract_dto.g.dart';
 // https://github.com/pact-foundation/pact-specification/tree/version-3
 
 @JsonSerializable()
-class Pact {
-  Provider provider;
-  Consumer consumer;
+class Pact implements ReifiedJson {
+  late Provider provider;
+  late Consumer consumer;
   List<Interaction> interactions = [];
   Metadata metadata = Metadata();
 
@@ -23,7 +24,7 @@ class Pact {
 }
 
 @JsonSerializable()
-class Metadata {
+class Metadata implements ReifiedJson {
   Metadata();
 
   Map<String, String> pactSpecification = {'version': '3.0.0'};
@@ -38,10 +39,10 @@ class Metadata {
 }
 
 @JsonSerializable()
-class Interaction {
-  String description;
-  Request request;
-  Response response;
+class Interaction implements ReifiedJson {
+  String? description;
+  late Request request;
+  late Response response;
   List<ProviderState> providerStates = [];
 
   Interaction();
@@ -53,8 +54,8 @@ class Interaction {
 }
 
 @JsonSerializable()
-class ProviderState {
-  String name;
+class ProviderState implements ReifiedJson {
+  late String name;
   Map<String, dynamic> params = {};
 
   ProviderState();
@@ -66,15 +67,15 @@ class ProviderState {
 }
 
 @JsonSerializable()
-class Response {
-  int status;
+class Response implements ReifiedJson {
+  late int status;
 
   Response();
 
   Map<String, String> headers = {};
 
   @JsonKey(fromJson: Body.fromJsonToBody)
-  Body body;
+  late Body body;
 
   factory Response.fromJson(Map<String, dynamic> json) =>
       _$ResponseFromJson(json);
@@ -83,16 +84,16 @@ class Response {
 }
 
 @JsonSerializable()
-class Request {
+class Request implements ReifiedJson {
   Request();
 
-  String method;
-  String path;
+  late String method;
+  late String path;
   Map<String, String> query = {};
   Map<String, String> headers = {};
 
   @JsonKey(fromJson: Body.fromJsonToBody)
-  Body body;
+  late Body body;
 
   factory Request.fromJson(Map<String, dynamic> json) =>
       _$RequestFromJson(json);
@@ -101,8 +102,8 @@ class Request {
 }
 
 @JsonSerializable()
-class Provider {
-  String name;
+class Provider implements ReifiedJson {
+  late String name;
 
   Provider();
 
@@ -113,8 +114,8 @@ class Provider {
 }
 
 @JsonSerializable()
-class Consumer {
-  String name;
+class Consumer implements ReifiedJson {
+  late String name;
 
   Consumer();
 

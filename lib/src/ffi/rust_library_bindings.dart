@@ -36,14 +36,12 @@ class _BooleanBridge {
 
 extension _StringExt on String {
   Pointer<Utf8> toNative() {
-    return Utf8.toUtf8(this);
+    return this.toNativeUtf8();
   }
 }
 
 extension _Utf8PointerExt on Pointer<Utf8> {
-  String toDartString() => ref.toString();
-
-  bool isNull() => this == null || this == nullptr;
+  bool isNull() => this == nullptr;
 }
 
 /// Opens the shared library given a local path.

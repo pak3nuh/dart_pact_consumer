@@ -25,9 +25,7 @@ void main() {
 }
 
 PactBuilder simpleBuilder() {
-  return PactBuilder()
-      ..consumer = 'consumer'
-      ..provider = 'provider'
+  return PactBuilder('consumer', 'provider')
       ..addState((stateBuilder) {
         stateBuilder
           ..state = 'my state'

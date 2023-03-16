@@ -12,7 +12,8 @@ class Union2<T1, T2> {
 
   Union2.t2(T2 t2) : this._(null, t2);
 
-  R fold<R>(Mapper<T1, R> t1Mapper, Mapper<T2, R> t2Mapper) {
+  /// Folds all values into a non nullable one
+  R fold<R extends Object>(Mapper<T1, R> t1Mapper, Mapper<T2, R> t2Mapper) {
     return _fold(t1Mapper, _t1) ?? _fold(t2Mapper, _t2)!;
   }
 }
@@ -31,7 +32,8 @@ class Union3<T1, T2, T3> {
 
   Union3.t3(T3 t3) : this._(null, null, t3);
 
-  R fold<R>(
+  /// Folds all values into a non nullable one
+  R fold<R extends Object>(
       Mapper<T1, R> t1Mapper, Mapper<T2, R> t2Mapper, Mapper<T3, R> t3Mapper) {
     return _fold(t1Mapper, _t1) ??
         _fold(t2Mapper, _t2) ??
@@ -46,8 +48,6 @@ R? _fold<R, W>(Mapper<W, R> mapper, [Object? input]) {
   return null;
 }
 
-final unit = Unit._();
-
 /// Unit is a concept where a single instance exists.
 ///
 /// In most cases it represents the absence of a value, like [Void].
@@ -55,9 +55,8 @@ final unit = Unit._();
 /// Work with unions to provide a difference between actual null and something
 /// that should be interpreted as null.
 class Unit implements CustomJson {
-  Unit._();
+  const Unit();
 
-  @override
   dynamic toJson() => null;
 }
 
@@ -90,7 +89,7 @@ class Default<T> {
 class Optional<T> extends Union2<T, Unit> {
   Optional.value(T value) : super.t1(value);
 
-  Optional.empty() : super.t2(unit);
+  Optional.empty() : super.t2(Unit());
 
   factory Optional.nullable(T? value) {
     return value?.let((nonNull) => Optional.value(nonNull)) ?? Optional.empty();

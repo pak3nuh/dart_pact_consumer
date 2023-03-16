@@ -15,6 +15,7 @@ final _default_lib_path =
 /// bindings to create a mock server to execute the matching process.
 class MockServerFactory {
   final DynamicLibrary _ffiLib;
+  static const JsonCodec _codec = JsonCodec();
 
   final Map<int, MockServer> _servers = {};
 
@@ -32,7 +33,7 @@ class MockServerFactory {
       ..consumer = (Consumer()..name = 'consumer-for-mock-server')
       ..provider = (Provider()..name = 'provider-for-mock-server')
       ..interactions = [interaction];
-    final contractAsJsonString = json.encode(pact);
+    final contractAsJsonString = _codec.encode(pact);
 
     MockServer createServer() {
       const host = '127.0.0.1';
@@ -72,7 +73,7 @@ class MockServerFactory {
     var file = File(libPathNn);
     if (!await file.exists()) {
       throw PactException('Library $libPathNn not found.'
-          'Try to run dart "pub run dart_pact_consumer:github_download" to get it from Github');
+          'Try to run dart "dart run dart_pact_consumer:github_download" to get it from Github');
     }
 
     var lib = bindings.open(libPathNn);
