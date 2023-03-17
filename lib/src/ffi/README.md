@@ -2,7 +2,7 @@
 
 - allocate and free are manual. not good
 - need native libraries for os/arch
-- RUST ffi https://docs.rs/pact_mock_server_ffi/0.0.17/pact_mock_server_ffi
+- RUST ffi https://docs.rs/pact_mock_server_ffi/0.1.1/pact_mock_server_ffi
 - foreign code runs on an Isolate base. may be useful to clean resources
 - PACT_MOCK_LOG_LEVEL variable name
 - server ports are used to differentiate interactions on pacts. 
@@ -17,6 +17,3 @@
 ## Conclusions
 ### ffi only support custom structs as of 2.12
 Can't build pact file with library.
-
-### ffi breaks as of 2.12 with current bindings
-2.12 breaks compatibility anyways with null safe semantics

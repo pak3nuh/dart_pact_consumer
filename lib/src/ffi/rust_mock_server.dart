@@ -9,9 +9,9 @@ import '../functional.dart';
 import 'rust_library_bindings.dart' as bindings;
 
 final _default_lib_path =
-    Directory.systemTemp.path + '/libpact_mock_server_ffi-v0.0.17';
+    '${Directory.systemTemp.path}/libpact_mock_server_ffi-v0.1.1';
 
-/// Factory that uses the [rust ffi v0.0.17](https://docs.rs/pact_mock_server_ffi/0.0.17)
+/// Factory that uses the [rust ffi v0.1.1](https://docs.rs/pact_mock_server_ffi/0.1.1)
 /// bindings to create a mock server to execute the matching process.
 class MockServerFactory {
   final DynamicLibrary _ffiLib;

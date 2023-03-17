@@ -16,7 +16,7 @@ final serverFactory = await MockServerFactory.create();
 The mock server requires an external library to launch, made by the team behind pact. This package uses defaults to
 load such library but it needs to be downloaded previously.
 
-To use the defaults run `dart pub run dart_pact_consumer:github_download`.
+To use the defaults run `dart run dart_pact_consumer:github_download`.
 
 ### Define each interaction
 ```dart
