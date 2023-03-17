@@ -4,7 +4,7 @@ import 'package:test/test.dart';
 
 void main() {
   group('PactHost', () {
-    const host = 'http://localhost:9292';
+    const host = 'http://192.168.96.1:9292';
     final client = PactHost(host);
 
     test('should get contracts', () async {

@@ -1,14 +1,11 @@
-import 'dart:io';
 
 import 'package:dart_pact_consumer/dart_pact_consumer.dart';
 import 'package:dart_pact_consumer/src/ffi/rust_mock_server.dart';
-import 'package:dart_pact_consumer/src/functional.dart';
 import 'package:dart_pact_consumer/src/pact_exceptions.dart';
 import 'package:test/test.dart';
 
 void main() async {
   final serverFactory = await MockServerFactory.create();
-  final repository = PactRepository();
 
   group('Mock server tests', () {
     tearDownAll(() {

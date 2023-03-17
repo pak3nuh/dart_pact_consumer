@@ -48,6 +48,8 @@ R? _fold<R, W>(Mapper<W, R> mapper, [Object? input]) {
   return null;
 }
 
+const unit = Unit._();
+
 /// Unit is a concept where a single instance exists.
 ///
 /// In most cases it represents the absence of a value, like [Void].
@@ -55,7 +57,7 @@ R? _fold<R, W>(Mapper<W, R> mapper, [Object? input]) {
 /// Work with unions to provide a difference between actual null and something
 /// that should be interpreted as null.
 class Unit implements CustomJson {
-  const Unit();
+  const Unit._();
 
   dynamic toJson() => null;
 }
@@ -81,18 +83,6 @@ class Default<T> {
     assert(_value != null);
     _producer = null;
     return _value!;
-  }
-}
-
-/// Replace with nullable
-@deprecated
-class Optional<T> extends Union2<T, Unit> {
-  Optional.value(T value) : super.t1(value);
-
-  Optional.empty() : super.t2(Unit());
-
-  factory Optional.nullable(T? value) {
-    return value?.let((nonNull) => Optional.value(nonNull)) ?? Optional.empty();
   }
 }
 

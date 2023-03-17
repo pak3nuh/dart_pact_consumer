@@ -7,7 +7,7 @@ import 'package:dart_pact_consumer/src/pact_host_client.dart';
 import 'package:test/test.dart';
 
 void main() async {
-  const brokerUrl = 'http://localhost:9292';
+  const brokerUrl = 'http://192.168.96.1:9292';
   final serverFactory = await MockServerFactory.create();
 
   group('ContractBuilder for pact broker', () {

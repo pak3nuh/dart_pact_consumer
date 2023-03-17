@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:dart_pact_consumer/dart_pact_consumer.dart';
 import 'package:dart_pact_consumer/src/ffi/rust_mock_server.dart';
 import 'package:dart_pact_consumer/src/functional.dart';
 import 'package:dart_pact_consumer/src/json_serialize.dart';
@@ -247,12 +246,12 @@ class Body extends Union3<Json, String, Unit> implements CustomJson {
   /// Body is explicitly null or is absent.
   ///
   /// [Doc](https://github.com/pact-foundation/pact-specification/tree/version-3#body-is-present-but-is-null)
-  Body.isNullOrAbsent() : super.t3(Unit());
+  Body.isNullOrAbsent() : super.t3(unit);
 
   @override
   dynamic toJson() {
-    var result = fold<Object>(
-      (js) => js.toJson(),
+    final result = fold<Object>(
+      (js) => js.toJson() as Object,
       (str) => str,
       (unit) => unit
     );

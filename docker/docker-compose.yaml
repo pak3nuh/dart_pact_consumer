@@ -1,8 +1,13 @@
 version: "3"
 services:
   local-pact-broker:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: pactfoundation/pact-broker:2.79.0.1
+    environment:
+      #https://hub.docker.com/r/pactfoundation/pact-broker
+      - PACT_BROKER_PORT=9292
+      # change when final db is available
+      - PACT_BROKER_DATABASE_ADAPTER=sqlite
+      - PACT_BROKER_LOG_LEVEL=INFO
+      - PACT_BROKER_SQL_LOG_LEVEL=DEBUG
     ports:
-      - 9292:9292
+      - "9292:9292"
