@@ -81,6 +81,10 @@ class PactHost {
     }
     return '';
   }
+
+  void close({bool force = false}) {
+    _client.close(force: force);
+  }
 }
 
 class PactHostException {

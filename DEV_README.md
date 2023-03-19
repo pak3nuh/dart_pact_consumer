@@ -16,6 +16,10 @@ Run `dart test`
 
 ## Integration tests
 
-Docker setup in the [docker](./docker) folder.
+Launch the pact broker container in the [compose](./docker/docker-compose.yaml) file.
 
-Then launch the integration tests with `dart test integration_test`
+Run the tests specifying the `PACT_HOST` flag in a `define` parameter. The test command doesn't respect the values
+passed as environment ([issue](https://github.com/dart-lang/sdk/issues/44562)), so we need to run each test
+individually with the `run` command.
+
+Or use the script `ls integration_test | xargs -i dart -DPACT_HOST=[broker] run integration_test/{}`.

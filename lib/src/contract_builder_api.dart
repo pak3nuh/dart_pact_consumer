@@ -197,7 +197,7 @@ class RequestBuilder {
 
   Map<String, String> query = {};
 
-  ResponseBuilder get response => _response ;
+  ResponseBuilder get response => _response;
   Body body = Body.isNullOrAbsent();
 
   Map<String, String> headers = {};
