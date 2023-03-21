@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:dart_pact_consumer/dart_pact_consumer.dart';
 import 'package:dart_pact_consumer/src/ffi/rust_mock_server.dart';
 import 'package:dart_pact_consumer/src/functional.dart';
 import 'package:dart_pact_consumer/src/json_serialize.dart';
@@ -37,7 +36,7 @@ class PactRepository {
   }
 
   /// Gets a pact file in JSON format
-  String getPactFile(String consumer, String provider) {
+  String? getPactFile(String consumer, String provider) {
     return _pacts[_key(consumer, provider)].let((value) {
       return jsonEncode(value);
     });
@@ -99,8 +98,9 @@ class RequestTester {
 
   RequestTester._(this._stateBuilder);
 
-  void test(MockServerFactory factory, RequestTestFunction testFunction) async {
-    final pactBuilder = PactBuilder()..stateBuilders.add(_stateBuilder);
+  Future<void> test(MockServerFactory factory, RequestTestFunction testFunction) async {
+    final pactBuilder = PactBuilder("mock-consumer", "mock-provider")
+      ..stateBuilders.add(_stateBuilder);
     final pact = PactRepository._createHeader(pactBuilder);
     PactRepository._mergeInteractions(pactBuilder, pact);
     final server = factory.createMockServer(pact.interactions[0]);
@@ -132,11 +132,11 @@ class RequestTester {
 /// . Generators
 /// . Encoders
 class PactBuilder {
-  String consumer;
-  String provider;
+  final String consumer;
+  final String provider;
   final List<StateBuilder> _states = [];
 
-  PactBuilder();
+  PactBuilder(this.consumer, this.provider);
 
   List<StateBuilder> get stateBuilders => _states;
 
@@ -149,8 +149,6 @@ class PactBuilder {
   }
 
   void validate({bool requireTests = true}) {
-    assert(consumer != null);
-    assert(provider != null);
     stateBuilders.forEach((element) => element._validate(requireTests));
   }
 }
@@ -158,14 +156,12 @@ class PactBuilder {
 enum Method { GET, POST, DELETE, PUT }
 
 class StateBuilder {
-  String state;
+  late String state;
   bool _tested = false;
 
   final List<RequestBuilder> requests = [];
 
   void _validate(bool requireTests) {
-    assert(state != null);
-    assert(requests != null);
     assert(requests.isNotEmpty);
     if (requireTests && !_tested) {
       throw PactException('State "$state" not tested');
@@ -197,7 +193,7 @@ class RequestBuilder {
 
   String description = '';
   Method method = Method.GET;
-  ResponseBuilder _response;
+  late ResponseBuilder _response;
 
   Map<String, String> query = {};
 
@@ -213,13 +209,7 @@ class RequestBuilder {
   }
 
   void _validate() {
-    assert(_path != null);
     assert(_path != '');
-    assert(query != null);
-    assert(method != null);
-    assert(_response != null);
-    assert(body != null);
-    assert(headers != null);
     _response._validate();
   }
 
@@ -234,9 +224,6 @@ class ResponseBuilder {
   Body body = Body.empty();
 
   void _validate() {
-    assert(headers != null);
-    assert(status != null);
-    assert(body != null);
   }
 
   ResponseBuilder._();
@@ -263,11 +250,15 @@ class Body extends Union3<Json, String, Unit> implements CustomJson {
 
   @override
   dynamic toJson() {
-    return fold(
-      (js) => js.toJson(),
+    final result = fold<Object>(
+      (js) => js.toJson() as Object,
       (str) => str,
-      (unit) => unit.toJson(),
+      (unit) => unit
     );
+    if (result is Unit) {
+      return null;
+    }
+    return result;
   }
 
   static Body fromJsonToBody(dynamic body) {

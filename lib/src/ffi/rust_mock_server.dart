@@ -9,12 +9,13 @@ import '../functional.dart';
 import 'rust_library_bindings.dart' as bindings;
 
 final _default_lib_path =
-    Directory.systemTemp.path + '/libpact_mock_server_ffi-v0.0.17';
+    '${Directory.systemTemp.path}/libpact_mock_server_ffi-v0.1.1';
 
-/// Factory that uses the [rust ffi v0.0.17](https://docs.rs/pact_mock_server_ffi/0.0.17)
+/// Factory that uses the [rust ffi v0.1.1](https://docs.rs/pact_mock_server_ffi/0.1.1)
 /// bindings to create a mock server to execute the matching process.
 class MockServerFactory {
   final DynamicLibrary _ffiLib;
+  static const JsonCodec _codec = JsonCodec();
 
   final Map<int, MockServer> _servers = {};
 
@@ -27,17 +28,17 @@ class MockServerFactory {
   /// on the external library is not possible.
   ///
   /// If [port] is null, then is assigned by the operating system
-  MockServer createMockServer(Interaction interaction, {int port}) {
+  MockServer createMockServer(Interaction interaction, {int? port}) {
     final pact = Pact()
       ..consumer = (Consumer()..name = 'consumer-for-mock-server')
       ..provider = (Provider()..name = 'provider-for-mock-server')
       ..interactions = [interaction];
-    final contractAsJsonString = json.encode(pact);
+    final contractAsJsonString = _codec.encode(pact);
 
     MockServer createServer() {
       const host = '127.0.0.1';
       var serverPort = bindings.createMockServer(_ffiLib, contractAsJsonString,
-          host: host, port: port);
+          host: host, port: port ?? 0);
       return MockServer._(host, serverPort, _ffiLib, interaction);
     }
 
@@ -67,15 +68,15 @@ class MockServerFactory {
   ///
   /// [libPath] can be used to provide a different path for the rust core
   /// library. **Using a different library version has unpredictable results**.
-  static Future<MockServerFactory> create({String libPath}) async {
-    libPath ??= _default_lib_path;
-    var file = File(libPath);
+  static Future<MockServerFactory> create({String? libPath}) async {
+    final libPathNn = libPath ?? _default_lib_path;
+    var file = File(libPathNn);
     if (!await file.exists()) {
-      throw PactException('Library $libPath not found.'
-          'Try to run dart "pub run dart_pact_consumer:github_download" to get it from Github');
+      throw PactException('Library $libPathNn not found.'
+          'Try to run dart "dart run dart_pact_consumer:github_download" to get it from Github');
     }
 
-    var lib = bindings.open(libPath);
+    var lib = bindings.open(libPathNn);
     return MockServerFactory._(lib);
   }
 
@@ -127,13 +128,13 @@ extension MockServerExt on MockServer {
   Future<HttpClientResponse> invoke(
     String path, {
     String method = 'GET',
-    Object body,
+    Object? body,
     Map<String, String> headers = const {'accept': 'application/json'},
     int status = 200,
   }) async {
     final client = HttpClient();
     final uri = Uri.parse('$address$path');
-    var req = await client.openUrl(method, uri);
+    final req = await client.openUrl(method, uri);
     headers.forEach((key, value) {
       req.headers.add(key, value);
     });

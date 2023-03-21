@@ -14,3 +14,10 @@
 
 - Introduces pact matching in unit tests
 - Better documentation
+
+## 0.2.0
+
+- Bumps dart SDK to 2.12
+- Updates dependencies to match dart SDK 2.12
+- Enables null safety
+- Bumps pact native library to 0.1.1

@@ -3,8 +3,15 @@ import 'package:dart_pact_consumer/src/pact_host_client.dart';
 import 'package:test/test.dart';
 
 void main() {
+  const pactHostEnv = 'PACT_HOST';
+  assert(
+    const bool.hasEnvironment(pactHostEnv),
+    'Please define the PACT_HOST env variable',
+  );
+  const hostAddress = String.fromEnvironment(pactHostEnv);
+
   group('PactHost', () {
-    const host = 'http://localhost:9292';
+    const host = 'http://$hostAddress';
     final client = PactHost(host);
 
     test('should get contracts', () async {
@@ -15,6 +22,8 @@ void main() {
           'pet-shop-api-provider', '0.0.1', 'my-special-tag');
 
       await client.addLabel('pet-shop-api-provider', 'my-label');
+
+      client.close(force: true);
     });
   });
 }

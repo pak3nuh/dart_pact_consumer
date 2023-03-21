@@ -1,14 +1,11 @@
-import 'dart:io';
 
 import 'package:dart_pact_consumer/dart_pact_consumer.dart';
 import 'package:dart_pact_consumer/src/ffi/rust_mock_server.dart';
-import 'package:dart_pact_consumer/src/functional.dart';
 import 'package:dart_pact_consumer/src/pact_exceptions.dart';
 import 'package:test/test.dart';
 
 void main() async {
   final serverFactory = await MockServerFactory.create();
-  final repository = PactRepository();
 
   group('Mock server tests', () {
     tearDownAll(() {
@@ -16,9 +13,7 @@ void main() async {
     });
 
     test('should fail with no interactions', () async {
-      final builder = PactBuilder()
-        ..consumer = 'consumer'
-        ..provider = 'provider';
+      final builder = PactBuilder('consumer', 'provider');
       final tester = builder.addState((state) {
         state.state = 'Given empty pet list';
         state.addRequest((request) {
@@ -40,9 +35,7 @@ void main() async {
     });
 
     test('should pass when interacted', () async {
-      final builder = PactBuilder()
-        ..consumer = 'consumer'
-        ..provider = 'provider';
+      final builder = PactBuilder('consumer', 'provider');
       final tester = builder.addState((state) {
         state.state = 'Given empty pet list';
         state.addRequest((request) {
@@ -61,9 +54,7 @@ void main() async {
     });
 
     test('should accept bodies as payload', () async {
-      final builder = PactBuilder()
-        ..consumer = 'consumer'
-        ..provider = 'provider';
+      final builder = PactBuilder('consumer', 'provider');
       final tester = builder.addState((state) {
         state.state = 'Given empty pet list';
         state.addRequest((request) {

@@ -7,7 +7,14 @@ import 'package:dart_pact_consumer/src/pact_host_client.dart';
 import 'package:test/test.dart';
 
 void main() async {
-  const brokerUrl = 'http://localhost:9292';
+  const pactHostEnv = 'PACT_HOST';
+  assert(
+    const bool.hasEnvironment(pactHostEnv),
+    'Please define the PACT_HOST env variable',
+  );
+  const hostAddress = String.fromEnvironment(pactHostEnv);
+
+  const brokerUrl = 'http://$hostAddress';
   final serverFactory = await MockServerFactory.create();
 
   group('ContractBuilder for pact broker', () {
@@ -15,9 +22,7 @@ void main() async {
     final repo = PactRepository();
 
     PactBuilder petShopApiBuilder() {
-      return PactBuilder()
-        ..consumer = 'dart-consumer'
-        ..provider = 'pet-shop-api-provider';
+      return PactBuilder('dart-consumer', 'pet-shop-api-provider');
     }
 
     test('should get pet list', () async {
@@ -76,6 +81,7 @@ void main() async {
       final closed = serverFactory.close();
       expect(closed, isTrue);
       await repo.publish(host, '0.0.1');
+      host.close(force: true);
     });
   });
 

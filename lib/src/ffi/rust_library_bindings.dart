@@ -36,14 +36,12 @@ class _BooleanBridge {
 
 extension _StringExt on String {
   Pointer<Utf8> toNative() {
-    return Utf8.toUtf8(this);
+    return this.toNativeUtf8();
   }
 }
 
 extension _Utf8PointerExt on Pointer<Utf8> {
-  String toDartString() => ref.toString();
-
-  bool isNull() => this == null || this == nullptr;
+  bool isNull() => this == nullptr;
 }
 
 /// Opens the shared library given a local path.
@@ -52,7 +50,7 @@ extension _Utf8PointerExt on Pointer<Utf8> {
 /// will tell the log level. Defaults to **PACT_MOCK_LOG_LEVEL**
 /// Valid values for the log level are: TRACE; DEBUG; INFO; WARN; ERROR
 ///
-/// [Docs](https://docs.rs/pact_mock_server_ffi/0.0.17/pact_mock_server_ffi/fn.init.html)
+/// [Docs](https://docs.rs/pact_mock_server_ffi/0.1.1/pact_mock_server_ffi/fn.init.html)
 DynamicLibrary open(String libPath,
     {String envLogVariable = 'PACT_MOCK_LOG_LEVEL'}) {
   final lib = DynamicLibrary.open(libPath);
@@ -83,10 +81,9 @@ typedef _createMockServerDart = int Function(
 
 /// Creates a mock server for matching purposes.
 ///
-/// [Docs](https://docs.rs/pact_mock_server_ffi/0.0.17/pact_mock_server_ffi/fn.create_mock_server.html)
+/// [Docs](https://docs.rs/pact_mock_server_ffi/0.1.1/pact_mock_server_ffi/fn.create_mock_server.html)
 int createMockServer(DynamicLibrary lib, String jsonPact,
     {String host = '127.0.0.1', int port = 0, bool useTls = false}) {
-  port ??= 0;
   assert(port >= 0, 'Invalid port');
   final createMockServerFunc =
       lib.lookupFunction<_createMockServerNative, _createMockServerDart>(
@@ -121,7 +118,7 @@ typedef _mockServerMatchedDart = int /*bool*/ Function(int mock_server_port);
 
 /// Returns a boolean indicating if the server on [port] as matched all requests.
 ///
-/// [Docs](https://docs.rs/pact_mock_server_ffi/0.0.17/pact_mock_server_ffi/fn.mock_server_matched.html)
+/// [Docs](https://docs.rs/pact_mock_server_ffi/0.1.1/pact_mock_server_ffi/fn.mock_server_matched.html)
 bool hasServerMatched(DynamicLibrary lib, int port) {
   final mockServerMatchedFunc =
       lib.lookupFunction<_mockServerMatchedNative, _mockServerMatchedDart>(
@@ -135,7 +132,7 @@ typedef _mockServerMismatchDart = Pointer<Utf8> Function(int mock_server_port);
 
 /// Returns a Json representation of all the mismatches that the server contains.
 ///
-/// [Docs](https://docs.rs/pact_mock_server_ffi/0.0.17/pact_mock_server_ffi/fn.mock_server_mismatches.html)
+/// [Docs](https://docs.rs/pact_mock_server_ffi/0.1.1/pact_mock_server_ffi/fn.mock_server_mismatches.html)
 String getJsonMismatch(DynamicLibrary lib, int port) {
   final mockServerMismatchFunc =
       lib.lookupFunction<_mockServerMismatchNative, _mockServerMismatchDart>(
@@ -154,7 +151,7 @@ typedef _cleanupMockServerDart = int /*bool*/ Function(int mock_server_port);
 /// Cleanups all resources for a previously created server. Returns true on
 /// successful cleanup and false if something went wrong or the server doesn't exist.
 ///
-/// [Docs](https://docs.rs/pact_mock_server_ffi/0.0.17/pact_mock_server_ffi/fn.cleanup_mock_server.html)
+/// [Docs](https://docs.rs/pact_mock_server_ffi/0.1.1/pact_mock_server_ffi/fn.cleanup_mock_server.html)
 bool cleanup(DynamicLibrary lib, int port) {
   final cleanupMockServerFunc =
       lib.lookupFunction<_cleanupMockServerNative, _cleanupMockServerDart>(
@@ -162,7 +159,7 @@ bool cleanup(DynamicLibrary lib, int port) {
   return _booleanBridge.fromNative(cleanupMockServerFunc(port));
 }
 
-void writePactFile(DynamicLibrary lib, int port, {String directory}) {
+void writePactFile(DynamicLibrary lib, int port, {String? directory}) {
   final dirNative = directory == null ? nullptr : directory.toNative();
   var func = lib.lookupFunction<
       Int32 Function(Int32 port, Pointer<Utf8> directory),
